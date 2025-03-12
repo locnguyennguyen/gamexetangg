@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trò chơi Xe tăng</title>
+    <style>
+        /* Thiết lập tỷ lệ khung hình 16:9 */
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #000000; /* Nền màu đen */
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            .container {
+    position: relative;
+    width: 100vw;
+    height: 400px; /* 56.25% của width (16:9) */
+    max-height: 100vh;
+    max-width: 300px; /* 177.78% của height (16:9) */
+    background-image: url('mattrang.png'); /* Thêm hình nền mattrang.png */
+    background-size: cover; /* Đảm bảo hình nền phủ kín container */
+    background-position: center; /* Căn giữa hình nền */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+        }
+
+        /* Container để giữ tỷ lệ 16:9 */
+        .container {
+            position: relative;
+            width: 100vw;
+            height: 400px; /* 56.25% của width (16:9) */
+            max-height: 100vh;
+            max-width: 300px; /* 177.78% của height (16:9) */
+            background-color: #333333; /* Nền container màu xám */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* Nút Bắt đầu */
+        .start-button {
+            padding: 15px 30px;
+            font-size: 1.5rem;
+            color: white;
+            background-color: #007BFF; /* Màu nền nút */
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .start-button:hover {
+            background-color: #0056b3; /* Màu nền nút khi hover */
+        }
+
+        /* Xe tăng */
+        .tank {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background-image: url('xetang.png'); /* Sử dụng hình ảnh xetang.png trong thư mục */
+            background-size: cover;
+            bottom: 10px; /* Vị trí ban đầu của xe tăng */
+            left: 50%;
+            transform: translateX(-50%);
+            display: none; /* Ẩn xe tăng ban đầu */
+        }
+
+        /* Đạn */
+        .bullet {
+            position: absolute;
+            width: 10px;
+            height: 20px;
+            background-color: yellow; /* Màu đạn */
+            bottom: 60px; /* Vị trí ban đầu của đạn */
+            display: none; /* Ẩn đạn ban đầu */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Nút Bắt đầu -->
+        <button class="start-button" onclick="startGame()">Bắt đầu</button>
+
+        <!-- Xe tăng -->
+        <div class="tank" id="tank"></div>
+
+        <!-- Đạn -->
+        <div class="bullet" id="bullet"></div>
+    </div>
+
+    <script>
+        // Lấy các phần tử
+        const tank = document.getElementById("tank");
+        const bullet = document.getElementById("bullet");
+        const container = document.querySelector(".container");
+
+        // Biến để kiểm soát trạng thái trò chơi
+        let gameStarted = false;
+        let tankPosition = 50; // Vị trí ban đầu của xe tăng (%)
+
+        // Hàm bắt đầu trò chơi
+        function startGame() {
+            gameStarted = true;
+            document.querySelector(".start-button").style.display = "none"; // Ẩn nút Bắt đầu
+            tank.style.display = "block"; // Hiển thị xe tăng
+            bullet.style.display = "block"; // Hiển thị đạn
+
+            // Bắt đầu lắng nghe sự kiện bàn phím
+            window.addEventListener("keydown", moveTank);
+            window.addEventListener("keydown", shootBullet);
+        }
+
+        // Hàm di chuyển xe tăng
+        function moveTank(event) {
+            if (!gameStarted) return;
+
+            if (event.key === "ArrowLeft" && tankPosition > 0) {
+                tankPosition -= 5; // Di chuyển sang trái
+            } else if (event.key === "ArrowRight" && tankPosition < 100) {
+                tankPosition += 5; // Di chuyển sang phải
+            }
+
+            // Cập nhật vị trí xe tăng
+            tank.style.left = `${tankPosition}%`;
+        }
+
+        // Hàm bắn đạn
+        function shootBullet(event) {
+            if (!gameStarted) return;
+
+            if (event.key === " ") { // Nhấn phím Space để bắn
+                bullet.style.left = `${tankPosition}%`; // Đặt vị trí đạn bằng vị trí xe tăng
+                bullet.style.bottom = "60px"; // Đặt vị trí ban đầu của đạn
+
+                // Di chuyển đạn lên trên
+                let bulletBottom = 60;
+                const bulletInterval = setInterval(() => {
+                    bulletBottom += 5; // Tốc độ đạn
+                    bullet.style.bottom = `${bulletBottom}px`;
+
+                    // Dừng đạn khi ra khỏi màn hình
+                    if (bulletBottom > container.clientHeight) {
+                        clearInterval(bulletInterval);
+                        bullet.style.display = "none"; // Ẩn đạn
+                    }
+                }, 100);
+            }
+        }
+    </script>
+</body>
+</html>
